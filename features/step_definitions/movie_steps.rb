@@ -11,8 +11,6 @@ m17 = Movie.create!(:title => '2001: A Space Odyssey', :rating => 'G', :release_
 m18 = Movie.create!(:title => 'The Incredibles', :rating => 'PG', :release_date => '5-Nov-2004')
 m19 = Movie.create!(:title => 'Raiders of the Lost Ark', :rating => 'PG', :release_date => '12-Jun-1981')
 m20 = Movie.create!(:title => 'Chicken Run', :rating => 'G', :release_date => '21-Jun-2000')
-
-
     # each returned element will be a hash whose key is the table header.
     # you should arrange to add that movie to the database here.
   end
@@ -36,4 +34,17 @@ When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
   # HINT: use String#split to split up the rating_list, then
   #   iterate over the ratings and reuse the "When I check..." or
   #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
+  rating_list.split(/,\s?/).each do |rating|
+    if uncheck
+      step %Q{I uncheck "ratings_#{rating}"}
+    else
+      step %Q{I check "ratings_#{rating}"}
+    end
+  end
 end
+
+Then /^I should see all of the movies$/ do
+  rows = page.all("table#movies tbody tr td[1]").map! {|t| t.text}
+  assert ( rows.size == Movie.all.count )
+end
+
